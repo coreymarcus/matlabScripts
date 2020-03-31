@@ -11,13 +11,13 @@ function [RBI] = wahbaSolver(aVec,vIMat,vBMat)
 % INPUTS
 %
 % aVec ------- Nx1 vector of least-squares weights.  aVec(i) is the weight
-%              corresponding to the ith pair of vectors 
+%              corresponding to the ith pair of vectors. N >= 2 
 %
 % vIMat ------ Nx3 matrix of 3x1 vectors expressed in the I frame.
-%              vIMat(i,:)' is the ith 3x1 vector. 
+%              vIMat(i,:)' is the ith 3x1 vector. N >= 2
 %
 % vBMat ------ Nx3 matrix of 3x1 vectors expressed in the B frame. vBMat(i,:)'
-%              is the ith 3x1 vector, which corresponds to vIMat(i,:)';
+%              is the ith 3x1 vector, which corresponds to vIMat(i,:)'; N >= 2
 %
 % OUTPUTS
 % 
@@ -28,7 +28,7 @@ function [RBI] = wahbaSolver(aVec,vIMat,vBMat)
 % References:
 %
 %
-% Author:  
+% Author:  Template by Todd Humphreys, Content by Corey Marcus
 %+==============================================================================+  
 
 B = zeros(3,3);
