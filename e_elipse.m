@@ -1,4 +1,4 @@
-function [] = e_elipse(handle,P,sigma,color)
+function [] = e_elipse(handle,P,mu,sigma,color)
 %Plot Error Elipses on figure
 figure(handle)
 hold on
@@ -49,7 +49,7 @@ R = [ cos(angle) sin(angle); -sin(angle) cos(angle) ];
 r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 
 % Draw the error ellipse
-plot(r_ellipse(:,1),r_ellipse(:,2),color)
+plot(r_ellipse(:,1) + mu(1), r_ellipse(:,2) + mu(2),color)
 
 %make a legend
 label = strcat(string(sigma), ' \sigma Error Elipse');
