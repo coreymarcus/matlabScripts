@@ -153,41 +153,7 @@ for ii = 1:Npart
     xMMSE_n = xMMSE_n + xHat{ii}.w*xHat{ii}.xHat_n;
 end
 
-% % perform kalman filter updates for each particle, finding p(x_l | x_n, y)
-% for ii = 1:Npart
-%
-%     %extract particle, build necessary matricies
-%     p = xHat{ii};
-%     C = sys.C(p.xHat_n);
-%     D = sys.D(p.xHat_n);
-%     P = p.P_l;
-%     R = sys.Peta;
-%     xHat_l = p.xHat_l;
-%     xHat_n = p.xHat_n;
-%
-%     %Kalman update
-%     K = P*C'/(C*P*C' + D*R*D');
-%     p.P_l = (eye(sys.N_l) - K*C)*P*(eye(sys.N_l) - K*C)' + K*D*R*D'*K';
-%     p.xHat_l = xHat_l + K*(y - sys.h(xHat_n) - C*xHat_l);
-%
-%     %reassign
-%     xHat{ii} = p;
-%
-% end
-
-% using the measurement, update the weights for each particle
-
-% propagate the kalman filter for each particle
-
-% use the propagation to sample the particles
-
-% use the samples as a measurement to perform another kalman update
-
-% obtain an estimate of the linear states
-
-% obtain an estimate of the nonlinear states
-
-
+%% Output
 
 xHatOut = xHat;
 end
