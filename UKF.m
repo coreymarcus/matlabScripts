@@ -109,7 +109,7 @@ for ii = 1:L
 end
 
 %state estimate
-xHatOut = xHat + (Pxy/(Pyy))*(y - yHat);
+xHatOut = xHat + (Pxy/Pyy)*(y - yHat);
 
 %covariance estimate
 PhatOut = Phat - (Pxy/Pyy)*Pxy';
