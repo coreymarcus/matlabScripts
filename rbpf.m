@@ -1,8 +1,8 @@
-function [xHatOut, xMMSE_l, xMMSE_n] = rbpf(sys, y, xHat, Params)
+function [xHatOut, xMMSE_l, xMMSE_n, P_lOut, P_nOut] = rbpf(sys, y, xHat, Params)
 %rbpf - Rao Blackwellised Particle Filter - provides an iteration of an
-%   RBPF given a system, measurement, and turning parameters. Source is
-%   Zanetti's notes on RBPFs
-%   CURRENTLY A_n AND f_l ARE ASSUMEED TO BE ZERO
+%   RBPF given a system, measurement, and turning parameters. Uses a
+%   bootstrap importance distribution. Source is Zanetti's notes on RBPFs
+%   CURRENTLY f_l ASSUMED TO BE ZERO
 %
 % Inputs
 % sys - system structure with the following elements
@@ -25,12 +25,21 @@ function [xHatOut, xMMSE_l, xMMSE_n] = rbpf(sys, y, xHat, Params)
 %   N_n = dim of nonlinear state
 %   N_l = dim of linear state
 % y = the measurement at time t = k
-% xHat - the state estimate FILL IN MORE DETAIL
+% xHat = the state estimate at time t = k-1, cell array where each cell is a
+%   structure corresponding to a particle with the following fields
+%   w - the particle weight
+%   xHat_l - an estimate of the linear states
+%   P_l - the covariance of the linear states
+%   xHat_n - an estimate of the nonlinear states
 % Params - parameter structure with the following parameters
 %   Npart = Number of particles to be used for the nonlinear states
 %
 % Outputs
-% xHatOut = the state estimate at time t = k, stacked as [x_l' x_n']'
+% xHatOut = the state estimate at time t = k
+% xMMSE_l - a MMSE estimate of the linear states
+% xMMSE_n - a MMSE estimate of the nonlinear states
+% P_lOut - the covariance of the linear states
+% P_nOut - the sample covariance of the nonlinear states
 
 %% Setup
 
@@ -38,14 +47,9 @@ function [xHatOut, xMMSE_l, xMMSE_n] = rbpf(sys, y, xHat, Params)
 Npart = Params.Npart;
 gaussEval = @(x, mu, P) 1/sqrt((2*pi)^length(x) * det(P))*exp(-.5*(x - mu)'*P^(-1)*(x - mu));
 
-%check to verify A_n and f_l are zero
-if(sys.A_n ~= 0)
-    disp('ERROR: Non-zero A_n')
-    return
-end
-
-if(sys.f_l ~= 0)
-    disp('ERROR: Non-zero f_l')
+%check to verify f_l = 0
+if(sum(abs(sys.f_l(zeros(sys.N_n,1)))) ~= 0)
+    disp('ERROR: Nonzero f_l!')
     return
 end
 
@@ -77,20 +81,24 @@ for ii = 1:Npart
     xHat_l_minus = xHat{ii}.xHat_l;
     P_l_minus = xHat{ii}.P_l;
     A_l = sys.A_l(xHat_n_minus);
+    A_n = sys.A_n(xHat_n_minus);
     B_n = sys.B_n(xHat_n_minus);
     B_l = sys.B_l(xHat_n_minus);
     
     % Draw Particles From Importance Distrubution (Bootstrap - p(x_k|x_k-1)
-    mu = sys.f_n(xHat_n_minus);
-    xHat{ii}.xHat_n = mvnrnd(mu, B_n*sys.Pnu_n*B_n')';
+    mu = sys.f_n(xHat_n_minus) + A_n*xHat_l_minus;
+    xHat{ii}.xHat_n = mvnrnd(mu, A_n*P_l_minus*A_n' + B_n*sys.Pnu_n*B_n')';
     
     % update the mean and covariance of all the KFs conditioned on the new
-    % particles (Don't need to do this because A_n = 0)
+    % particles
+    W = A_n*P_l_minus*A_n' + B_n*sys.Pnu_n*B_n';
+    K = P_l_minus*A_n'/W;
+    xHat{ii}.xHat_l = xHat_l_minus + K*(xHat{ii}.xHat_n - mu);
+    xHat{ii}.P_l = P_l_minus - K*W*K';
     
-    % propagate the mean and covariance of the KFs (this is unecessary for
-    % SLAM because map is static)
-    xHat{ii}.xHat_l = A_l*xHat_l_minus;
-    xHat{ii}.P_l = A_l*P_l_minus*A_l' + B_l*sys.Pnu_l*B_l';
+    % propagate the mean and covariance of the KFs
+    xHat{ii}.xHat_l = A_l*xHat{ii}.xHat_l;
+    xHat{ii}.P_l = A_l*xHat{ii}.P_l*A_l' + B_l*sys.Pnu_l*B_l';
     
     
 end
@@ -106,25 +114,17 @@ for ii = 1:Npart
     w_minus = xHat{ii}.w;
     xHat_n = xHat{ii}.xHat_n;
     xHat_l = xHat{ii}.xHat_l;
-    %     A_l = sys.A_l(xHat_n);
-    B_n = sys.B_n(xHat_n);
-    %     B_l = sys.B_l(xHat_n);
-    f_n = sys.f_n(xHat_n);
-    Q_n = sys.Pnu_n;
     R = sys.Peta;
     h_n = sys.h(xHat_n);
     C = sys.C(xHat_n);
     D = sys.D(xHat_n);
     P_l = xHat{ii}.P_l;
     
-    % Evauluate the gaussians
-    %     p1 = gaussEval(xHat_n, f_n, B_n*Q_n*B_n');
-    p2 = gaussEval(y, h_n + C*xHat_l, C*P_l*C' + D*R*D');
-    %     p3 = gaussEval(xHat_n, f_n, B_n*Q_n*B_n');
+    % Evauluate the gaussian
+    p = gaussEval(y, h_n + C*xHat_l, C*P_l*C' + D*R*D');
     
     % update the weights
-    %xHat{ii}.w = w_minus*p1*p2/p3;
-    xHat{ii}.w = w_minus*p2; %equivalent for bootstrap
+    xHat{ii}.w = w_minus*p;
     wTrack = wTrack + xHat{ii}.w;
     
     % Update the KFs with the measurement
@@ -151,6 +151,15 @@ xMMSE_n = zeros(sys.N_n,1);
 for ii = 1:Npart
     xMMSE_l = xMMSE_l + xHat{ii}.w*xHat{ii}.xHat_l;
     xMMSE_n = xMMSE_n + xHat{ii}.w*xHat{ii}.xHat_n;
+end
+
+%Covariance
+P_lOut = zeros(sys.N_l);
+P_nOut = zeros(sys.N_n);
+for kk = 1:Npart
+    P_nOut = P_nOut + xHat{kk}.w*(xHat{kk}.xHat_n - xMMSE_n)*(xHat{kk}.xHat_n - xMMSE_n)';
+    P_lOut = P_lOut + xHat{kk}.w*(xHat{kk}.P_l + xHat{kk}.xHat_l*xHat{kk}.xHat_l' - ...
+        xMMSE_l*xMMSE_l');
 end
 
 %% Output

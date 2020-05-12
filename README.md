@@ -1,6 +1,8 @@
 # matlabScripts
 A bunch of general matlab scripts which have been useful in the past
 
+BPF - Bootstrap Particle Filter
+---
 
 CKF - Cubature Kalman Filter
 ---
@@ -21,6 +23,9 @@ GQKF - Gauss-Hermite Quadrature Kalman Filter
 ---
 
 GSF - Gaussian Sum Filter
+---
+
+initBPF - Initialize Bootstrap Particle Filter
 ---
 
 initGSF - Initialize Gaussian Sum Filter
