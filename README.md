@@ -20,6 +20,12 @@ frameROTM - Converts from Euler angles to a DCM
 GQKF - Gauss-Hermite Quadrature Kalman Filter
 ---
 
+GSF - Gaussian Sum Filter
+---
+
+initGSF - Initialize Gaussian Sum Filter
+---
+
 ode45orbitpropogation - A basic orbit propagator
 ---
 

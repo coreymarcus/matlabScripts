@@ -1,4 +1,4 @@
-function [xHatOut, PhatOut] = EKF(sys, y, xHat, Phat, Params)
+function [xHatOut, PhatOut, wEval] = EKF(sys, y, xHat, Phat, Params)
 %EKF - Extended Kalman Filter - provides an iteration of an EKF given a
 %system, measurement, and turning parameters. Source is
 % Inputs
@@ -13,13 +13,22 @@ function [xHatOut, PhatOut] = EKF(sys, y, xHat, Phat, Params)
 % xHat = the state estimate at time t = k-1
 % Phat = the state estimate covariance at time t = k-1
 % Params - parameter structure with the following parameters
-%   Optional, can fill in if needed
+%   evalLikelihood = boolean detirmining if the likelihood of the
+%       measurement is evaluated. Used when the EKF is included in the
+%       Gaussian sum filter
 %
 % Outputs
 % xHatOut = the state estimate at time t = k
 % PhatOut = the state estimate covariance at time t = k
 
 %% Setup
+
+%extract
+eval = Params.evalLikelihood;
+
+%function to evaluate gaussians
+gaussEval = @(x, mu, P) 1/sqrt((2*pi)^length(x) * det(P))*exp(-.5*(x - mu)'*P^(-1)*(x - mu));
+
 
 %% Propagation
 
@@ -50,6 +59,13 @@ xHatOut = xBar + K*(y - yBar);
 %covariance estimate (Josephs Form)
 I = eye(length(xHat));
 PhatOut = (I - K*H)*Pbar*(I - K*H)' + K * sys.R *K';
+
+%evaluate weight (if needed)
+if(eval)
+    wEval = gaussEval(y, yBar, S);
+else
+    wEval = [];
+end
 
 end
 
