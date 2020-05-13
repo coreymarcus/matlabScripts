@@ -52,6 +52,9 @@ rbpf - Rao-Blackwellised Particle Filter
 state2OE - Produces orbital elements from a state space
 ---
 
+sysresample - Systematic Resampling for Particle Filters and Gaussian Mixtures
+---
+
 UKF - Unscented Kalman Filter
 ---
 
