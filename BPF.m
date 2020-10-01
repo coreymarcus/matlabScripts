@@ -85,8 +85,12 @@ xHat.est = sum(xHat.w.*xHat.pMat,2);
 
 %Covariance
 xHat.P = zeros(length(xHat.est));
-for kk = 1:n
+for ii = 1:n
     xHat.P = xHat.P + xHat.w(ii)*(xHat.pMat(:,ii) - xHat.est)*(xHat.pMat(:,ii) - xHat.est)';
+end
+
+if(xHat.P == 0)
+    disp('here')
 end
 
 %% Output

@@ -30,7 +30,7 @@ end
 
 %Covariance
 xHatOut.P = zeros(length(xHatOut.est));
-for kk = 1:n
+for ii = 1:n
     xHatOut.P = xHatOut.P + xHatOut.w(ii)*(xHatOut.pMat(:,ii) - xHatOut.est)*(xHatOut.pMat(:,ii) - xHatOut.est)';
 end
 
