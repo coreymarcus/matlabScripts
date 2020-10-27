@@ -1,4 +1,4 @@
-function [] = plot_elipse(handle,P,mu,sigma,color)
+function [] = plot_elipse(handle,P,mu,sigma,color,makelegend)
 %Plot Error Elipses on figure
 figure(handle)
 hold on
@@ -52,8 +52,10 @@ r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 plot(r_ellipse(:,1)+mu(1),r_ellipse(:,2)+mu(2),color)
 
 %make a legend
-label = strcat(string(sigma), ' \sigma Error Elipse');
-legend('Data',label,'Location','best')
+if(makelegend)
+    label = strcat(string(sigma), ' \sigma Error Elipse');
+    legend('Data',label,'Location','best')
+end
 
 end
 
