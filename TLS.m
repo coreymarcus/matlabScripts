@@ -1,4 +1,4 @@
-function [m, b] = TLS(x, y)
+function [m, b, P] = TLS(x, y, sig2_x, sig2_y)
 % TLS - Total Least Squares. Performs a single dimension linear fit of a
 % line y=mx+b to a set of x and y data points. Use when there is
 % measurement noise in x and y, and when you are equally confident in all
@@ -8,10 +8,15 @@ function [m, b] = TLS(x, y)
 % INPUTS:
 % x - an [nx1] or [1xn] vector of x measurements
 % y - an [nx1] or [1xn] vector of y measurements
+% sig2_x - the error variance in x measurments
+% sig2_y - the error variance in y measurments
 % 
 % OUTPUTS:
 % m - slope of best fit line
 % b - y intercept of best fit line
+% P - the estimate covariance matrix. I'm not currently sure how to
+%     estimate this for TLS, so I've output the standard Least Squares
+%     covariance matrix
 
 %number of data points
 n = length(x);
@@ -37,6 +42,11 @@ r = x_tilde*cos(phi) + y_tilde*sin(phi);
 %find line parameters
 m = -1/tan(phi);
 b = r/sin(phi);
+
+%estimate the covariance
+H = ones(n,2);
+H(:,1) = x;
+P = (sig2_x+sig2_y)*eye(2)/(H'*H);
 
 end
 
