@@ -49,7 +49,7 @@ R = [ cos(angle) sin(angle); -sin(angle) cos(angle) ];
 r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 
 % Draw the error ellipse
-plot(r_ellipse(:,1)+mu(1),r_ellipse(:,2)+mu(2),color)
+plot(r_ellipse(:,1)+mu(1),r_ellipse(:,2)+mu(2),color,'LineWidth',2)
 
 %make a legend
 if(makelegend)
