@@ -8,5 +8,9 @@ if(isnan(p))
     p = 0;
 end
 
+if(~isreal(p))
+    disp('imaginary gaussEval!')
+end
+
 end
 
