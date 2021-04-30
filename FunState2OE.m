@@ -25,7 +25,7 @@ i = acosd(h(3)/norm(h));
 %line of nodes
 n = cross([0 0 1]',h);
 
-%calculate Ohmega
+%calculate Ohmega longitude of ascending node
 if n(2) >= 0
     Ohm = acosd(n(1)/norm(n));
 elseif n(2) < 0
