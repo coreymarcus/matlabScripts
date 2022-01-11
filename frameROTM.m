@@ -11,28 +11,26 @@ if length(order) ~= 3
     return
 end
 
-R_int = zeros(3,3,3);
+R = eye(3);
 
 for ii = 1:3
     if order(ii) == 1
-        R_int(:,:,ii) = [1 0 0;
-                        0 cos(angles(ii)) sin(angles(ii));
-                        0 -sin(angles(ii)) cos(angles(ii))];
+        R = [1 0 0;
+            0 cos(angles(ii)) sin(angles(ii));
+            0 -sin(angles(ii)) cos(angles(ii))]*R;
     elseif order(ii) == 2
-        R_int(:,:,ii) = [cos(angles(ii)) 0 -sin(angles(ii));
-                         0 1 0;
-                         sin(angles(ii)) 0 cos(angles(ii))];
+        R = [cos(angles(ii)) 0 -sin(angles(ii));
+            0 1 0;
+            sin(angles(ii)) 0 cos(angles(ii))]*R;
     elseif order(ii) == 3
-        R_int(:,:,ii) = [cos(angles(ii)) sin(angles(ii)) 0;
-                        -sin(angles(ii)) cos(angles(ii)) 0;
-                         0 0 1];
+        R = [cos(angles(ii)) sin(angles(ii)) 0;
+            -sin(angles(ii)) cos(angles(ii)) 0;
+            0 0 1]*R;
     else
         disp('ERROR: Invalid Order')
         return
     end
 end
-
-R = R_int(:,:,3)*R_int(:,:,2)*R_int(:,:,1);
 
 end
 
