@@ -7,7 +7,7 @@ test = fun(x);
 N = length(test);
 
 deriv = zeros(N,n);
-parfor ii = 1:n
+for ii = 1:n
     dx = zeros(n,1);
     dx(ii) = h;
     funEvalF = fun(x + dx);
