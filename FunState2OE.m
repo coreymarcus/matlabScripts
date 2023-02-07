@@ -31,7 +31,7 @@ if n(2) >= 0
 elseif n(2) < 0
     Ohm = 360-acosd(n(1)/norm(n));
 else
-    disp('ERROR!!!')
+    error('Invalid long of ascending node')
 end
 
 %normalized eccentricity and line of nodes
@@ -44,7 +44,7 @@ if e(3) >= 0
 elseif e(3) < 0
     w = 360-acosd(nhat'*ehat); %Q2 or Q3
 else
-    disp('ERROR!!!')
+    error('Invalid argument of periapse')
 end
 
 %normalized radius
